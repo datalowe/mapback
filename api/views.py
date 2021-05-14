@@ -1,48 +1,13 @@
 from django.contrib.auth import get_user_model
 
-from rest_framework import authentication, permissions
-from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
+from rest_framework import authentication
+from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-
-
-from .serializers import LocationSerializer
-from locations.models import Location
-
-class LocationsListCreate(ListCreateAPIView):
-    """
-    View to list all of the user's locations.
-
-    * Requires token authentication.
-    """
-    queryset= Location.objects.all()
-    serializer_class = LocationSerializer
-    authentication_classes = [authentication.TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def filter_queryset(self, queryset):
-        return queryset.filter(owner=self.request.user)
-
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
-
-class LocationsRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
-    """
-    View to retrieve a single location, or update it,
-    or destroy it.
-
-    * Requires token authentication.
-    """
-    queryset= Location.objects.all()
-    serializer_class = LocationSerializer
-    authentication_classes = [authentication.TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def filter_queryset(self, queryset):
-        return queryset.filter(owner=self.request.user)
-
+from .serializers import LocationSerializer, MarkerIconSerializer
+from locations.models import Location, MarkerIcon
 
 class CreateUser(APIView):
     """
@@ -78,3 +43,49 @@ class CreateUser(APIView):
             password=request.data['password']
         )
         return Response({'message': 'User created!'}, status=201)
+
+
+class LocationsListCreate(ListCreateAPIView):
+    """
+    View to list all of the user's locations.
+
+    * Requires token authentication.
+    """
+    queryset= Location.objects.all()
+    serializer_class = LocationSerializer
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def filter_queryset(self, queryset):
+        return queryset.filter(owner=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+class LocationsRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
+    """
+    View to retrieve a single location, or update it,
+    or destroy it.
+
+    * Requires token authentication.
+    """
+    queryset= Location.objects.all()
+    serializer_class = LocationSerializer
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def filter_queryset(self, queryset):
+        return queryset.filter(owner=self.request.user)
+
+
+class MarkerIconsList(ListAPIView):
+    """
+    View to list all marker icons (these will be the same
+    for all users).
+
+    * Requires token authentication.
+    """
+    queryset= MarkerIcon.objects.all()
+    serializer_class = MarkerIconSerializer
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [IsAuthenticated]

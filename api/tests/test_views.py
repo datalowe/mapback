@@ -269,3 +269,21 @@ class ActAsUserTestCase(TestCase):
         self.assertTrue(
             Location.objects.filter(description=updated_loc['description']).exists()
         )
+
+    def test_get_icons_valid_credentials(self):
+        """
+        Visiting the icons list endpoint with
+        valid credentials returns a response
+        which includes all of the user's locations.
+        """
+        self.c.credentials(HTTP_AUTHORIZATION='Token ' + self.test_user_token.key)
+        resp = self.c.get(
+            reverse_lazy('api:markericons-l'), 
+        )
+        self.assertEqual(resp.status_code, 200)
+        # response returned as many objects as there are
+        # locations owned by the user in the database
+        self.assertEqual(
+            MarkerIcon.objects.count(),
+            len(resp.data)
+        )

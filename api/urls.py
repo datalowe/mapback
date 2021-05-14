@@ -10,4 +10,5 @@ urlpatterns = [
     path('register/', views.CreateUser.as_view(), name='create-user'),
     path('locations/', views.LocationsListCreate.as_view(), name='locations-lc'),
     path('locations/<int:pk>/', views.LocationsRetrieveUpdateDestroy.as_view(), name='locations-rud'),
+    path('markericons/', views.MarkerIconsList.as_view(), name='markericons-l'),
 ]

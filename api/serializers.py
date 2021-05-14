@@ -20,3 +20,13 @@ class LocationSerializer(ModelSerializer):
             'icon',
             'significance'
         ]
+
+
+class MarkerIconSerializer(ModelSerializer):
+    class Meta:
+        model = MarkerIcon
+        fields = [
+            'id',
+            'code_name',
+            'humanreadable_name'
+        ]
