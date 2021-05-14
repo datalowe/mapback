@@ -88,6 +88,15 @@ class ActAsUserTestCase(TestCase):
         self.test_user_token = Token.objects.create(user=self.test_user)
         self.test_user_2 = get_user_model().objects.get(username='regular')
         self.test_user_2_token = Token.objects.create(user=self.test_user_2)
+        self.add_loc = {
+            'place_name': 'Jaroslav Jezek Memorial',
+            'address': 'Kaprova, Old Town, Prague, Czechia',
+            'latitude': 50.08818,
+            'longitude': 14.41727,
+            'description': 'A memorial',
+            'significance': MarkerSignificance.objects.all()[0].id,
+            'icon': MarkerIcon.objects.all()[0].id
+        }
 
     def tearDown(self):
         self.c.credentials()
@@ -191,18 +200,72 @@ class ActAsUserTestCase(TestCase):
         database record and returns created status code.
         """
         self.c.credentials(HTTP_AUTHORIZATION='Token ' + self.test_user_token.key)
-        new_loc = {
-            'place_name': 'Jaroslav Jezek Memorial',
-            'address': 'Kaprova, Old Town, Prague, Czechia',
-            'latitude': 50.08818,
-            'longitude': 14.41727,
-            'description': 'A memorial',
-            'significance': MarkerSignificance.objects.all()[0].id,
-            'icon': MarkerIcon.objects.all()[0].id
-        }
+
         resp = self.c.post(
             reverse_lazy('api:locations-lc'),
-            new_loc
+            self.add_loc
         )
         self.assertEqual(resp.status_code, 201)
+        self.assertTrue(
+            Location.objects.filter(place_name=self.add_loc['place_name']).exists()
+        )
 
+    def test_delete_location_valid_credentials(self):
+        """
+        Deleting a location with valid credentials updates
+        database and returns 'no content' status code.
+
+        * Note that this test relies on above 'creation' test already working.
+        """
+        self.c.credentials(HTTP_AUTHORIZATION='Token ' + self.test_user_token.key)
+        resp_create = self.c.post(
+            reverse_lazy('api:locations-lc'),
+            self.add_loc
+        )
+        resp_delete = self.c.delete(
+            reverse_lazy('api:locations-rud', kwargs={'pk': resp_create.data['id']})
+        )
+        self.assertEqual(resp_delete.status_code, 204)
+        self.assertFalse(
+            Location.objects.filter(place_name=self.add_loc['place_name']).exists()
+        )
+    
+    def test_delete_location_wrong_user(self):
+        """
+        Trying to delete another user's location produces a 404 error response.
+
+        * Note that this test relies on above 'creation' test already working.
+        """
+        self.c.credentials(HTTP_AUTHORIZATION='Token ' + self.test_user_token.key)
+        resp_create = self.c.post(
+            reverse_lazy('api:locations-lc'),
+            self.add_loc
+        )
+        self.c.credentials(HTTP_AUTHORIZATION='Token ' + self.test_user_2_token.key)
+        resp_delete = self.c.delete(
+            reverse_lazy('api:locations-rud', kwargs={'pk': resp_create.data['id']})
+        )
+        self.assertEqual(resp_delete.status_code, 404)
+
+    def test_update_location_valid_credentials(self):
+        """
+        Updating a location with valid credentials updates
+        database and produces 200 status code response.
+
+        * Note that this test relies on above 'creation' test already working.
+        """
+        self.c.credentials(HTTP_AUTHORIZATION='Token ' + self.test_user_token.key)
+        resp_create = self.c.post(
+            reverse_lazy('api:locations-lc'),
+            self.add_loc
+        )
+        updated_loc = {x:y for x,y in self.add_loc.items()}
+        updated_loc['description'] = 'updated description'
+        resp_put = self.c.put(
+            reverse_lazy('api:locations-rud', kwargs={'pk': resp_create.data['id']}),
+            updated_loc
+        )
+        self.assertEqual(resp_put.status_code, 200)
+        self.assertTrue(
+            Location.objects.filter(description=updated_loc['description']).exists()
+        )
