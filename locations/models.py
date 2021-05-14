@@ -33,7 +33,7 @@ class MarkerSignificance(models.Model):
     # a concise 
     # a label that describes a marker's significance,
     # eg "definitely visit" or "visit if there's time"
-    significance_label = models.CharField(max_length=20)
+    significance_label = models.CharField(max_length=30)
     # hex code of default color that corresponds to significance. 
     # note that hex codes do not include a pound sign, so
     # instead of '#f0abcd', one would store 'f0abcd'
