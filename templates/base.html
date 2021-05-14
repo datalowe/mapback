@@ -1,0 +1,22 @@
+{% load static %}
+
+<!doctype html>
+<html lang="sv">
+<head>
+  <title>{% block title %}MapBack test front-end{% endblock title %}</title>
+  <meta charset="utf-8">
+  <link rel='stylesheet' href="{% static 'css/bootstrap.min.css' %}">
+  <link rel='stylesheet' href="{% static 'css/locations.css' %}">
+</head>
+<body>
+  <header class='mb-3'>
+      <i class="fa fa-car app-car fa-2x"></i>
+      <h1 class="site-title"><a href="{% url 'locations:location-list' %}">Roadtrip 2020</a></h1>
+      <!-- {# if user.is_authenticated #}<span class="nav-logout"><a href="{# url 'logout' #}" class="site-title">Logga ut</a></span>{# endif #} -->
+  </header>
+  <main class='container'>
+  {% block content %}
+  {% endblock content %}
+  </main>
+</body>
+</html>

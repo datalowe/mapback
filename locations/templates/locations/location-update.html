@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Uppdatera plats{% endblock title %}
+
+{% block content %}
+<h1 class="content-section">Redigera '{{ location }}'</h1>
+<section class='content-section'>
+  <form method="POST" >
+    {% csrf_token %}
+    {{ form|crispy }}
+    <input type="submit" class='btn btn-primary' value='Spara'>
+  </form>
+</section>
+{% endblock content %}

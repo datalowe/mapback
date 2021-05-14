@@ -1,0 +1,7 @@
+__pycache__
+.vscode/
+*.swp
+.env
+.venv
+db.sqlite3
+.DS_Store

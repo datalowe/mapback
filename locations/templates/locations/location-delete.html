@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Uppdatera plats{% endblock title %}
+
+{% block content %}
+<h1  class="content-section">Radera '{{ location }}'</h1>
+<section class='content-section'>
+  <p class="alert alert-danger">Är du säker på att du vill radera platsen '{{ location }}'?</p>
+  <form method="POST">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <input type="submit" class='btn btn-danger' value='Radera'>
+  </form>
+  <a href="{% url 'locations:location-detail' location.pk %}" class="btn btn-outline-secondary mt-3 mb-3">Avbryt</a>
+</section>
+{% endblock content %}

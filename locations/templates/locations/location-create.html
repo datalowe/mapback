@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Lägg till plats{% endblock title %}
+
+{% block content %}
+<h1>Lägg till plats</h1>
+<form method="POST" >
+  {% csrf_token %}
+  {{ form|crispy }}
+  <input type="submit" class='btn btn-primary' value='Spara'>
+</form>
+{% endblock content %}

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ location }}{% endblock title %}
+
+{% block content %}
+<h1 class='content-section'>{{ location }}</h1>
+{% if location.description %}
+<section class='content-section'>
+  <h2>Beskrivning</h2>
+  <p>{{ location.description }}</p>
+</section>
+{% endif %}
+{% if location.business_hours %}
+<section class='content-section'>
+<h2>Öppettider</h2>
+<p>{{ location.business_hours }}</p>
+</section>
+{% endif %}
+<section class='content-section'>
+<h2>Geografisk position</h2>
+<p>Latitud: {{ location.latitude }}</p>
+<p>Longitud: {{ location.longitude }}</p>
+</section>
+{% if user.is_authenticated %}
+<a href="{% url 'locations:location-update' location.pk %}" class='btn btn-outline-secondary mb-3'>Redigera</a>
+<a href="{% url 'locations:location-delete' location.pk %}" class='btn btn-outline-danger mb-3'>Radera</a>
+{% endif %}
+{% endblock content %}

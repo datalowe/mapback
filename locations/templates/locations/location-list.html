@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Platser{% endblock title %}
+
+{% block content %}
+<h1 class='content-section'>Platser</h1>
+<table class='location-table table content-section table-hover'>
+  <thead class='thead-light'>
+    <tr class='location-table-header'>
+      <th>Namn</th>
+      <th>Latitud</th>
+      <th>Longitud</th>
+      <th>Öppettider</th>
+      <th>Beskrivning</th>
+      <th>Färgkod</th>
+      <th>Ikon</th>
+    </tr>
+  </thead>
+
+{% if locations %}
+  <tbody>
+  {% for location in locations %}
+    <tr class='location-table-row'>
+      <td><a href="{# url 'locations:location-detail' location.pk %#">{{ location.place_name_shortened }}</a></td>
+      <td>{{ location.latitude_shortened }}</td>
+      <td>{{ location.longitude_shortened }}</td>
+      <td>{{ location.business_hours_shortened }}</td>
+      <td>{{ location.description_shortened }}</td>
+      <td>{{ location.priority }}</td>
+      <td>{{ location.icon }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+{% endif %}
+</table>
+<a href="{# url 'locations:location-create'#}" class='btn btn-outline-secondary mb-3'>Lägg till ny plats</a>
+{% endblock content %}
