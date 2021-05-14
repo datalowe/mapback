@@ -1,4 +1,3 @@
-from django.db.models import Q
 from django.test import TestCase
 from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
@@ -77,7 +76,8 @@ class CreateUserTestCase(TestCase):
 class ActAsUserTestCase(TestCase):
     """
     Integration tests where a user logs in and interacts with the API.
-    Note that these rely on basic user creation tests above running correctly.
+    
+    * Note that these rely on basic user creation tests above running correctly.
     """
     def setUp(self):
         self.c = APIClient()
