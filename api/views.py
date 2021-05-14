@@ -1,13 +1,22 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 
 from rest_framework import authentication
-from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView, ListCreateAPIView
+from rest_framework.generics import (
+    ListAPIView, 
+    RetrieveUpdateDestroyAPIView, 
+    ListCreateAPIView
+)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import LocationSerializer, MarkerIconSerializer
-from locations.models import Location, MarkerIcon
+from .serializers import (
+    LocationSerializer, 
+    MarkerIconSerializer, 
+    MarkerSignificanceSerializer
+)
+from locations.models import Location, MarkerIcon, MarkerSignificance
 
 class CreateUser(APIView):
     """
@@ -47,7 +56,8 @@ class CreateUser(APIView):
 
 class LocationsListCreate(ListCreateAPIView):
     """
-    View to list all of the user's locations.
+    View to list all of the user's locations, or
+    create new user-bound location.
 
     * Requires token authentication.
     """
@@ -89,3 +99,38 @@ class MarkerIconsList(ListAPIView):
     serializer_class = MarkerIconSerializer
     authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [IsAuthenticated]
+
+
+class MarkerSignificancesListOrCreate(ListCreateAPIView):
+    """
+    View to list all of the user's marker significances,
+    and significances where owner is set to NULL, or
+    create new user-bound significance.
+
+    * Requires token authentication.
+    """
+    queryset= MarkerSignificance.objects.all()
+    serializer_class = MarkerSignificanceSerializer
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def filter_queryset(self, queryset):
+        return queryset.filter(Q(owner=self.request.user) | Q(owner__isnull=True))
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+
+class MarkerSignificancesRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
+    """
+    View to retrieve, update or destroy a single significance.
+
+    * Requires token authentication.
+    """
+    queryset= MarkerSignificance.objects.all()
+    serializer_class = MarkerSignificanceSerializer
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def filter_queryset(self, queryset):
+        return queryset.filter(Q(owner=self.request.user) | Q(owner__isnull=True))

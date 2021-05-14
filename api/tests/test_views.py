@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.test import TestCase
 from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
@@ -78,7 +79,6 @@ class ActAsUserTestCase(TestCase):
     Integration tests where a user logs in and interacts with the API.
     Note that these rely on basic user creation tests above running correctly.
     """
-
     def setUp(self):
         self.c = APIClient()
         self.auth_url = reverse_lazy('api:obtain-auth-token')
@@ -97,6 +97,23 @@ class ActAsUserTestCase(TestCase):
             'significance': MarkerSignificance.objects.all()[0].id,
             'icon': MarkerIcon.objects.all()[0].id
         }
+        self.add_sig = {
+            'significance_label': 'Added significance',
+            'hex_code': '101010',
+            'color_name': 'addcolor'
+        }
+        self.test_user_significance = MarkerSignificance.objects.create(
+            significance_label='If I really have nothing else to do',
+            hex_code='808080',
+            color_name='boring-grey',
+            owner=self.test_user
+        )
+        self.test_user_2_significance = MarkerSignificance.objects.create(
+            significance_label='BBQ place - only the best',
+            hex_code='ffa030',
+            color_name='flamy',
+            owner=self.test_user_2
+        )
 
     def tearDown(self):
         self.c.credentials()
@@ -286,4 +303,65 @@ class ActAsUserTestCase(TestCase):
         self.assertEqual(
             MarkerIcon.objects.count(),
             len(resp.data)
+        )
+    
+    def test_get_significances_valid_credentials(self):
+        """
+        Visiting the marker significances list endpoint with
+        valid credentials returns a response
+        which includes all of the user's significances,
+        as well as significances with owner set to NULL.
+        """
+        self.c.credentials(HTTP_AUTHORIZATION='Token ' + self.test_user_token.key)
+        resp = self.c.get(
+            reverse_lazy('api:markersignificances-lc'), 
+        )
+        self.assertEqual(resp.status_code, 200)
+        # response returned as many objects as there are
+        # locations owned by the user in the database
+        self.assertEqual(
+            MarkerSignificance.objects.filter(owner=self.test_user).count() +
+            MarkerSignificance.objects.filter(owner__isnull=True).count(),
+            len(resp.data)
+        )
+
+    def test_create_significance_valid_credentials(self):
+        """
+        Creating a significance with valid data creates new
+        database record and returns created status code.
+        """
+        self.c.credentials(HTTP_AUTHORIZATION='Token ' + self.test_user_token.key)
+
+        resp = self.c.post(
+            reverse_lazy('api:markersignificances-lc'), 
+            self.add_sig
+        )
+        self.assertEqual(resp.status_code, 201)
+        self.assertTrue(
+            MarkerSignificance.objects.filter(
+                significance_label=self.add_sig['significance_label']
+            ).exists()
+        )
+
+    def test_delete_significance_valid_credentials(self):
+        """
+        Deleting a significance with valid credentials updates
+        database and returns 'no content' status code.
+
+        * Note that this test relies on above 'creation' test already working.
+        """
+        self.c.credentials(HTTP_AUTHORIZATION='Token ' + self.test_user_token.key)
+        resp_create = self.c.post(
+            reverse_lazy('api:markersignificances-lc'),
+            self.add_sig
+        )
+        resp_delete = self.c.delete(
+            reverse_lazy('api:markersignificances-rud', 
+            kwargs={'pk': resp_create.data['id']})
+        )
+        self.assertEqual(resp_delete.status_code, 204)
+        self.assertFalse(
+            MarkerSignificance.objects.filter(
+                significance_label=self.add_sig['significance_label']
+            ).exists()
         )

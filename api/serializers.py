@@ -1,6 +1,10 @@
 from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
 
-from locations.models import Location, MarkerIcon, MarkerSignificance
+from locations.models import (
+    Location, 
+    MarkerIcon, 
+    MarkerSignificance
+)
 
 
 class LocationSerializer(ModelSerializer):
@@ -17,8 +21,8 @@ class LocationSerializer(ModelSerializer):
             'longitude', 
             'business_hours',
             'description',
+            'significance',
             'icon',
-            'significance'
         ]
 
 
@@ -29,4 +33,14 @@ class MarkerIconSerializer(ModelSerializer):
             'id',
             'code_name',
             'humanreadable_name'
+        ]
+
+class MarkerSignificanceSerializer(ModelSerializer):
+    class Meta:
+        model = MarkerSignificance
+        fields = [
+            'id',
+            'significance_label',
+            'hex_code',
+            'color_name'
         ]
