@@ -12,7 +12,7 @@ services:
 # it may create test databases)
 before_script:
   - psql -c 'CREATE DATABASE projectdb;' -U postgres
-  - psql -c "CREATE ROLE travis_user PASSWORD 'dbpassword' NOSUPERUSER CREATEDB;" -U postgres
+  - psql -c "CREATE ROLE travis_user PASSWORD 'dbpassword' NOSUPERUSER CREATEDB LOGIN;" -U postgres
   - psql -c 'GRANT ALL PRIVILEGES ON DATABASE projectdb TO travis_user;' -U postgres
 script:
   - export $(grep -v '^#' .env.travis | xargs)
