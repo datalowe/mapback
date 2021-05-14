@@ -3,6 +3,8 @@ from django.urls import reverse_lazy
 from django.contrib.auth.models import User
 from django.utils import timezone
 
+from django.db.models import Q
+
 SHORTENED_LENGTH = 20
 
 class MarkerIcon(models.Model):
@@ -31,20 +33,43 @@ class MarkerSignificance(models.Model):
     # a concise 
     # a label that describes a marker's significance,
     # eg "definitely visit" or "visit if there's time"
-    significance_label = models.CharField(max_length=20, unique=True)
+    significance_label = models.CharField(max_length=20)
     # hex code of default color that corresponds to significance. 
     # note that hex codes do not include a pound sign, so
     # instead of '#f0abcd', one would store 'f0abcd'
-    hex_code = models.CharField(max_length=6, unique=True)
+    hex_code = models.CharField(max_length=6)
     # a human readable color name, eg 'fuchsia' or
     # 'light yellow'
-    color_name = models.CharField(max_length=20, unique=True)
+    color_name = models.CharField(max_length=20)
     # significances are linked to users, except default
     # significances where the user is set to NULL
     owner = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return f'{self.significance_label} ({self.color_name})'
+    
+    def save(self, *args, **kwargs):
+        """
+        Overrides default save method to add a check for any
+        color/label collisions between new significance and
+        significances that are default or previously created
+        by user. No error is raised - this is only meant as
+        a last safeguard, validation is expected to be
+        implemented at earlier stages.
+        """
+        collision = MarkerSignificance.objects.filter(
+            (Q(owner=self.owner)  | Q(owner__isnull=True))
+            &
+            (
+                Q(significance_label=self.significance_label) |
+                Q(hex_code=self.hex_code) |
+                Q(color_name=self.color_name)
+            )
+        ).exists()
+        if collision:
+            return
+        super().save(*args, **kwargs)
+
 
 class Location(models.Model):
     """
@@ -72,7 +97,6 @@ class Location(models.Model):
         if self.address:
             return self.address
         return f'Location at: ({self.latitude}, {self.longitude})'
-        
 
     class Meta:
         ordering = ['place_name']
