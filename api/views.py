@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 
 from rest_framework import authentication, permissions
-from rest_framework.generics import RetrieveUpdateAPIView, ListCreateAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -28,7 +28,7 @@ class LocationsListCreate(ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
-class LocationsRetrieveUpdateDestroy(RetrieveUpdateAPIView):
+class LocationsRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):
     """
     View to retrieve a single location, or update it,
     or destroy it.
