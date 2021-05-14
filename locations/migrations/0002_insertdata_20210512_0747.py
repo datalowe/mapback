@@ -11,8 +11,6 @@ def add_users(app_registry, schema_editor):
         {
             'username': 'lowe',
             'password': 'password',
-            'is_superuser': True,
-            'is_staff': True
         },
         {
             'username': 'regular',
