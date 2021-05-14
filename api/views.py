@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 
 from rest_framework import authentication
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import (
     ListAPIView, 
     RetrieveUpdateDestroyAPIView, 
@@ -25,6 +26,9 @@ class CreateUser(APIView):
     def post(self, request, format=None):
         """
         Create a new user.
+
+        TODO add additional username/password validation, eg ensuring that
+        username consists of only alphanumeric characters.
         """
         check_keys = ('username', 'password')
         if any([key not in request.data for key in check_keys]):
@@ -118,6 +122,23 @@ class MarkerSignificancesListOrCreate(ListCreateAPIView):
         return queryset.filter(Q(owner=self.request.user) | Q(owner__isnull=True))
 
     def perform_create(self, serializer):
+        data = self.request.data
+        user_or_null_q = (Q(owner=self.request.user)  | Q(owner__isnull=True))
+        label_collision_q = MarkerSignificance.objects.filter(
+            user_or_null_q & Q(significance_label=data['significance_label'])
+        )
+        hex_collision_q = MarkerSignificance.objects.filter(
+            user_or_null_q & Q(hex_code=data['hex_code'])
+        )
+        cname_collision_q = MarkerSignificance.objects.filter(
+            user_or_null_q & Q(color_name=data['color_name'])
+        )
+        if label_collision_q.exists():
+            raise ValidationError('Label already in use.')
+        if hex_collision_q.exists():
+            raise ValidationError('Hex code already in use.')
+        if cname_collision_q.exists():
+            raise ValidationError('Color name already in use.')
         serializer.save(owner=self.request.user)
 
 

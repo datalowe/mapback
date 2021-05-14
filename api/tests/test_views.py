@@ -103,7 +103,7 @@ class ActAsUserTestCase(TestCase):
             'color_name': 'addcolor'
         }
         self.test_user_significance = MarkerSignificance.objects.create(
-            significance_label='If I really have nothing else to do',
+            significance_label='If nothing to do',
             hex_code='808080',
             color_name='boring-grey',
             owner=self.test_user
@@ -342,6 +342,23 @@ class ActAsUserTestCase(TestCase):
                 significance_label=self.add_sig['significance_label']
             ).exists()
         )
+    
+    def test_create_significance_duplicate_label(self):
+        """
+        Attempting to create a significance with a label
+        already used by one of user's significances 
+        provokes an error response.
+        """
+        self.c.credentials(HTTP_AUTHORIZATION='Token ' + self.test_user_token.key)
+
+        dup_sig = {x:y for x,y in self.add_sig.items()}
+        dup_sig['significance_label'] = self.test_user_significance.significance_label
+
+        resp = self.c.post(
+            reverse_lazy('api:markersignificances-lc'), 
+            dup_sig
+        )
+        self.assertEqual(resp.status_code, 400)
 
     def test_delete_significance_valid_credentials(self):
         """
