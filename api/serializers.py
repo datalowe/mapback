@@ -42,5 +42,6 @@ class MarkerSignificanceSerializer(ModelSerializer):
             'id',
             'significance_label',
             'hex_code',
-            'color_name'
+            'color_name',
+            'owner_id'
         ]
