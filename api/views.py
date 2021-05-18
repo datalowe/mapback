@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 
 from rest_framework import authentication
+from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import (
     ListAPIView, 
@@ -51,11 +52,12 @@ class CreateUser(APIView):
                 {'message': 'That username is not available.'},
                 status=409
             )
-        get_user_model().objects.create_user(
+        new_user = get_user_model().objects.create_user(
             username=request.data['username'], 
             password=request.data['password']
         )
-        return Response({'message': 'User created!'}, status=201)
+        user_token = Token.objects.create(user=new_user)
+        return Response({'message': 'User created!', 'token': user_token.key}, status=201)
 
 
 class LocationsListCreate(ListCreateAPIView):
