@@ -24,16 +24,80 @@ def add_icons(app_registry, schema_editor):
     MarkerIcon = app_registry.get_model('locations', 'MarkerIcon')
     new_icons = [
         {
-            'code_name': 'utensils',
-            'humanreadable_name': 'utensils',
+            "code_name": "bed",
+            "humanreadable_name": "bed"
         },
         {
-            'code_name': 'shopping',
-            'humanreadable_name': 'shopping bag',
+            "code_name": "bus",
+            "humanreadable_name": "bus"
         },
         {
-            'code_name': 'house',
-            'humanreadable_name': 'house',
+            "code_name": "coffee",
+            "humanreadable_name": "coffee"
+        },
+        {
+            "code_name": "cross",
+            "humanreadable_name": "cross"
+        },
+        {
+            "code_name": "crown",
+            "humanreadable_name": "crown"
+        },
+        {
+            "code_name": "globe",
+            "humanreadable_name": "globe"
+        },
+        {
+            "code_name": "hamburger",
+            "humanreadable_name": "hamburger"
+        },
+        {
+            "code_name": "house",
+            "humanreadable_name": "house"
+        },
+        {
+            "code_name": "mountain",
+            "humanreadable_name": "mountain"
+        },
+        {
+            "code_name": "ship",
+            "humanreadable_name": "ship"
+        },
+        {
+            "code_name": "shopping-bag",
+            "humanreadable_name": "shopping bag"
+        },
+        {
+            "code_name": "shopping-cart",
+            "humanreadable_name": "shopping cart"
+        },
+        {
+            "code_name": "subway",
+            "humanreadable_name": "subway"
+        },
+        {
+            "code_name": "swimmer",
+            "humanreadable_name": "swimmer"
+        },
+        {
+            "code_name": "train",
+            "humanreadable_name": "train"
+        },
+        {
+            "code_name": "tram",
+            "humanreadable_name": "tram"
+        },
+        {
+            "code_name": "tree",
+            "humanreadable_name": "tree"
+        },
+        {
+            "code_name": "important-building",
+            "humanreadable_name": "important building"
+        },
+        {
+            "code_name": "utensils",
+            "humanreadable_name": "utensils"
         }
     ]
     for i in new_icons:
@@ -126,7 +190,8 @@ class Migration(migrations.Migration):
     ]
 
     add_funs = (
-        add_users, add_icons, 
+        add_users, 
+        add_icons, 
         add_significances, add_locations,
         add_visitedgeopositions
     )
