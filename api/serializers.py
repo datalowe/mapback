@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
+from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField, CharField
 
 from locations.models import (
     Location, 
@@ -36,6 +36,9 @@ class MarkerIconSerializer(ModelSerializer):
         ]
 
 class MarkerSignificanceSerializer(ModelSerializer):
+    hex_code = CharField(max_length=7, required=True)
+    color_name = CharField(required=False, allow_blank=True)
+
     class Meta:
         model = MarkerSignificance
         fields = [
@@ -45,3 +48,8 @@ class MarkerSignificanceSerializer(ModelSerializer):
             'color_name',
             'owner_id'
         ]
+        extra_kwargs = {
+            'hex_code': {
+                'validators': []
+            },
+        }

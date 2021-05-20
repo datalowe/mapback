@@ -20,6 +20,8 @@ from .serializers import (
 )
 from locations.models import Location, MarkerIcon, MarkerSignificance
 
+from .util import colornames
+
 class CreateUser(APIView):
     """
     View to register/create a new user.
@@ -125,15 +127,26 @@ class MarkerSignificancesListOrCreate(ListCreateAPIView):
 
     def perform_create(self, serializer):
         data = self.request.data
+
+        # hex codes are to always be saved without an initial '#' symbol
+        hex_code = data['hex_code'].replace('#', '').lower()
+
+        # if no color name has been provided, use the colornames library
+        # to find the best match
+        if ('color_name' not in data) or not data['color_name']:
+            color_name = colornames.find('#' + hex_code)
+        else:
+            color_name = data['color_name']
+
         user_or_null_q = (Q(owner=self.request.user)  | Q(owner__isnull=True))
         label_collision_q = MarkerSignificance.objects.filter(
             user_or_null_q & Q(significance_label=data['significance_label'])
         )
         hex_collision_q = MarkerSignificance.objects.filter(
-            user_or_null_q & Q(hex_code=data['hex_code'])
+            user_or_null_q & Q(hex_code=hex_code)
         )
         cname_collision_q = MarkerSignificance.objects.filter(
-            user_or_null_q & Q(color_name=data['color_name'])
+            user_or_null_q & Q(color_name=color_name)
         )
         if label_collision_q.exists():
             raise ValidationError('Label already in use.')
@@ -141,7 +154,7 @@ class MarkerSignificancesListOrCreate(ListCreateAPIView):
             raise ValidationError('Hex code already in use.')
         if cname_collision_q.exists():
             raise ValidationError('Color name already in use.')
-        serializer.save(owner=self.request.user)
+        serializer.save(owner=self.request.user, hex_code=hex_code, color_name=color_name)
 
 
 class MarkerSignificancesRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):

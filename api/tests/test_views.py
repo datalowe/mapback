@@ -342,7 +342,69 @@ class ActAsUserTestCase(TestCase):
                 significance_label=self.add_sig['significance_label']
             ).exists()
         )
-    
+
+    def test_create_significance_excluding_colorname(self):
+        """
+        Creating a significance with valid data, excluding
+        color name (or leaving it blank), creates new
+        database record where color hex code has been used
+        to produce appropriate color name.
+        """
+        self.c.credentials(HTTP_AUTHORIZATION='Token ' + self.test_user_token.key)
+
+        add_sig_1 = {
+            'significance_label': 'Added significance 1',
+            # colorpicker library name: 'Dune'
+            'hex_code': '3e3e3e'
+        }
+
+        add_sig_2 = {
+            'significance_label': 'Added significance 2',
+            # colorpicker library name: 'Wild Sand'
+            'hex_code': '#f5f5f5'
+        }
+
+        add_sig_3 = {
+            'significance_label': 'Added significance 3',
+            # colorpicker library name: 'Jaffa'
+            'hex_code': '#f88333',
+            'color_name': ''
+        }
+
+        resp1 = self.c.post(
+            reverse_lazy('api:markersignificances-lc'), 
+            add_sig_1
+        )
+
+        resp2 = self.c.post(
+            reverse_lazy('api:markersignificances-lc'), 
+            add_sig_2
+        )
+
+        resp3 = self.c.post(
+            reverse_lazy('api:markersignificances-lc'), 
+            add_sig_3
+        )
+
+        self.assertEqual(resp1.status_code, 201)
+        self.assertEqual(resp2.status_code, 201)
+        self.assertEqual(resp3.status_code, 201)
+        self.assertTrue(
+            MarkerSignificance.objects.filter(
+                color_name='Dune'
+            ).exists()
+        )
+        self.assertTrue(
+            MarkerSignificance.objects.filter(
+                color_name='Wild Sand'
+            ).exists()
+        )
+        self.assertTrue(
+            MarkerSignificance.objects.filter(
+                color_name='Jaffa'
+            ).exists()
+        )
+
     def test_create_significance_duplicate_label(self):
         """
         Attempting to create a significance with a label
