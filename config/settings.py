@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     # Local
     'api.apps.ApiConfig',
     'locations.apps.LocationsConfig',
+    'weather.apps.WeatherConfig'
     # 'api.apps.ApiConfig',
 ]
 
