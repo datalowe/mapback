@@ -41,4 +41,9 @@ urlpatterns = [
         views.MarkerIconsList.as_view(), 
         name='markericons-l'
     ),
+    path(
+        'forecasts/',
+        views.ForecastPointList.as_view(),
+        name='forecasts-l'
+    )
 ]

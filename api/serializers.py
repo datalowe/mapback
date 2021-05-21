@@ -6,6 +6,8 @@ from locations.models import (
     MarkerSignificance
 )
 
+from weather.models import ForecastPoint
+
 
 class LocationSerializer(ModelSerializer):
     icon = PrimaryKeyRelatedField(many=False, read_only=False, queryset=MarkerIcon.objects.all())
@@ -35,6 +37,7 @@ class MarkerIconSerializer(ModelSerializer):
             'humanreadable_name'
         ]
 
+
 class MarkerSignificanceSerializer(ModelSerializer):
     hex_code = CharField(max_length=7, required=True)
     color_name = CharField(required=False, allow_blank=True)
@@ -53,3 +56,30 @@ class MarkerSignificanceSerializer(ModelSerializer):
                 'validators': []
             },
         }
+
+
+class ForecastPointSerializer(ModelSerializer):
+    class Meta:
+        model = ForecastPoint
+        fields = [
+            'id',
+            'forecast_start_datetime', 
+            'latitude', 
+            'longitude', 
+            'symbol_name_0h',
+            't_0h',
+            'symbol_name_1h',
+            't_1h',
+            'symbol_name_2h',
+            't_2h',
+            'symbol_name_2h',
+            't_2h',
+            'symbol_name_3h',
+            't_3h',
+            'symbol_name_4h',
+            't_4h',
+            'symbol_name_5h',
+            't_5h',
+            'symbol_name_6h',
+            't_6h',
+        ]

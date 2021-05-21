@@ -1,3 +1,5 @@
+import json
+
 from django.test import TestCase
 from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
@@ -6,6 +8,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
 from locations.models import Location, MarkerSignificance, MarkerIcon
+from weather.models import ForecastPoint
 
 class CreateUserTestCase(TestCase):
     """
@@ -444,3 +447,48 @@ class ActAsUserTestCase(TestCase):
                 significance_label=self.add_sig['significance_label']
             ).exists()
         )
+
+
+class ForecastPointListTestCase(TestCase):
+    """
+    Integration tests where a user logs in and gets weather data from API.
+    
+    * Note that these rely on basic user creation tests above running correctly.
+    """
+    def setUp(self):
+        self.c = APIClient()
+        self.auth_url = reverse_lazy('api:obtain-auth-token')
+        # uses a preexisting user, which is created in 'fixture migration'
+        # in 'locations/migrations/0002_insertdata_20210512_0747.py'
+        self.test_user = get_user_model().objects.get(username='lowe')
+        self.test_user_token = Token.objects.create(user=self.test_user)
+        self.retrieve_coords = {
+            'coords': 
+                [
+                    {"lat": 59.3293235, "lon": 18.0685808}, 
+                    {"lat": 57.7, "lon": 11.9666666667}
+                ]
+        }
+
+    def tearDown(self):
+        self.c.credentials()
+    
+    # DISABLED usually, to avoid making unnecessary calls to weather API
+    # def test_get_weather_data(self):
+    #     """
+    #     Retrieving weather data for two sets of previously unregistered coordinates 
+    #     adds two entries to forecast points table.
+    #     """
+    #     pre_num_forecastpoints = ForecastPoint.objects.count()
+    #     self.c.credentials(HTTP_AUTHORIZATION='Token ' + self.test_user_token.key)
+    #     # default django test client JSON formatting doesn't work here, so we
+    #     # need to do it manually
+    #     resp = self.c.post(
+    #         reverse_lazy('api:forecasts-l'),
+    #         data=json.dumps(self.retrieve_coords),
+    #         content_type='application/json'
+    #     )
+    #     # print(resp.data)
+    #     self.assertEqual(resp.status_code, 201)
+    #     post_num_forecastpoints = ForecastPoint.objects.count()
+    #     self.assertEqual(pre_num_forecastpoints + len(self.retrieve_coords['coords']), post_num_forecastpoints)
