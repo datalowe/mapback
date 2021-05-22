@@ -193,13 +193,10 @@ class ForecastPointList(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None):
-        # print(request.data)
         try:
             coord_ls = request.data['coords']
         except:
             raise ValidationError('Missing required property: coords.')
-        print(coord_ls)
-        print(type(coord_ls))
         try:
             if not isinstance(coord_ls, list):
                 parsed_coord_ls = json.loads(coord_ls)
@@ -207,14 +204,13 @@ class ForecastPointList(APIView):
                 parsed_coord_ls = coord_ls
         except:
             raise ValidationError('coords data format is invalid.')
-        print(parsed_coord_ls)
         if not isinstance(parsed_coord_ls, list):
             raise ValidationError('coords must be an array of coordinate objects.')
         rounded_coords = []
         for coord in parsed_coord_ls:
             if ('lat' not in coord) or ('lon' not in coord):
                 raise ValidationError("All coordinate objects must have 'lat' and 'lon' properties")
-            if abs(coord['lat']) > 90 or abs(coord['lon']) > 180:
+            if abs(float(coord['lat'])) > 90 or abs(float(coord['lon'])) > 180:
                 raise ValidationError(f"Invalid coordinates: ({coord['lat']}, {coord['lon']})")
             r_c = round_coords([coord['lat'], coord['lon']], 4)
             rounded_coords.append(r_c)
