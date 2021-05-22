@@ -28,15 +28,20 @@ if os.getenv('DEBUG_ON')=='True':
 else:
     DEBUG = False
 
-ALLOWED_HOSTS = [
+if DEBUG:
+    ALLOWED_HOSTS = [
+        'localhost',
+    ]
+else:
+    ALLOWED_HOSTS = [
+        'heroku.com',
+    ]
 
-]
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -47,13 +52,11 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-    # 'crispy_forms',
 
     # Local
     'api.apps.ApiConfig',
     'locations.apps.LocationsConfig',
-    'weather.apps.WeatherConfig'
-    # 'api.apps.ApiConfig',
+    'weather.apps.WeatherConfig',
 ]
 
 MIDDLEWARE = [
@@ -140,6 +143,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -151,5 +155,4 @@ REST_FRAMEWORK = {
 if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True
 else:
-    CORS_ORIGIN_WHITELIST = [
-    ]
+    CORS_ORIGIN_WHITELIST = ['*']
