@@ -37,7 +37,7 @@ if DEBUG:
 else:
     ALLOWED_HOSTS = [
         'heroku.com',
-        'herokuapps.com',
+        'mymap-mapback.herokuapp.com',
     ]
 
 
