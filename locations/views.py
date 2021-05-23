@@ -1,10 +1,10 @@
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect
-from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
-from django.urls import reverse_lazy
+# from django.contrib.auth import authenticate, login, logout
+# from django.contrib.auth.mixins import LoginRequiredMixin
+# from django.shortcuts import redirect
+# from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
+# from django.urls import reverse_lazy
 
-from .models import Location
+# from .models import Location
 
 
 # class LocationCreateView(LoginRequiredMixin, CreateView):
@@ -31,10 +31,10 @@ from .models import Location
 
 
 # class LocationListView(LoginRequiredMixin, ListView):
-class LocationListView(ListView):
-    model = Location
-    context_object_name = 'locations'
-    template_name = 'locations/location-list.html'
+# class LocationListView(ListView):
+#     model = Location
+#     context_object_name = 'locations'
+#     template_name = 'locations/location-list.html'
 
 
 # class LocationUpdateView(LoginRequiredMixin, UpdateView):
