@@ -155,4 +155,5 @@ REST_FRAMEWORK = {
 if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True
 else:
-    CORS_ORIGIN_WHITELIST = ['*']
+    # for now - to enable course examiner to try out front end app
+    CORS_ALLOW_ALL_ORIGINS = True
